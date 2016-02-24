@@ -1,5 +1,6 @@
 package com.example.vitalykulyk.kpischedule;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Vitaly Kulyk on 23.02.2016.
@@ -37,15 +40,21 @@ import java.util.List;
 public class ScheduleFragment extends Fragment {
 
     //Array adapter for
-    ArrayAdapter<String> mScheduleAdapter;
+    ArrayAdapter<Lesson> mScheduleAdapter;
 
     ListView mListView;
+
+    List<Lesson> testSchedule;
+
+    LessonAdapter mLessonAdapter;
+
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -69,37 +78,46 @@ public class ScheduleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        String[] scheduleArray = {
-                "1. PPKS",
-                "2. History of ukrainian culture",
-                "3. KM",
-                "4. TOE",
-                "5. TEK",
-                "6. FICT",
-                "7. OK"
-        };
+//        ScheduleTask scheduleTask = new ScheduleTask();
+//        scheduleTask.execute("io-32");
 
-        List<String> weekforecast = new ArrayList<>(Arrays.asList(scheduleArray));
+//        Lesson[] scheduleArray = {
+//                new Lesson("1.","512-18","PPKS","LAB","KORO"),
+//                new Lesson("2.","513-18","KM","LEKT","MARK") ,
+//                new Lesson("3.","511-18","OOP","LAB","SIMO") ,
+//                new Lesson("4.","515-18","KS","LAB","KULA")  ,
+//
+//        };
+
+        ArrayList<Lesson> testSchedule = new ArrayList<>();
+        testSchedule.add(new Lesson("1.","512-18","PPKS","LAB","KORO"));
+        testSchedule.add(new Lesson("2.","513-18","KM","LEKT","MARK") );
+        testSchedule.add(new Lesson("3.","511-18","OOP","LAB","SIMO") );
+        testSchedule.add(new Lesson("4.","515-18","KS","LAB","KULA")  );
 
 
-        mScheduleAdapter = new ArrayAdapter<String>(
-                //current context
-                getActivity(),
-                //ID of list item
-                R.layout.list_item_schedule,
-                //forecast data
-                R.id.list_item_forecast_textview,
-                //forecast data
-                weekforecast);
+//        mScheduleAdapter = new ArrayAdapter<Lesson>(
+//                //current context
+//                getActivity(),
+//                //ID of list item
+//                R.layout.list_item_schedule,
+//                //forecast data
+//                R.id.list_item_forecast_textview,
+//                //forecast data
+//                testSchedule);
 
         mListView = (ListView)rootView.findViewById(R.id.listview_forecast);
 
-        mListView.setAdapter(mScheduleAdapter);
+        //mListView.setAdapter(mScheduleAdapter);
+
+        mLessonAdapter = new LessonAdapter(getActivity(), R.layout.list_item, testSchedule);
+
+        mListView.setAdapter(mLessonAdapter);
 
         return rootView;
     }
 
-    public class ScheduleTask extends AsyncTask<String, Void, String[]> {
+    public class ScheduleTask extends AsyncTask<String, Void, Lesson[]> {
 
         private final String LOG_CAT = ScheduleTask.class.getSimpleName();
 
@@ -110,7 +128,7 @@ public class ScheduleFragment extends Fragment {
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getScheduleDataFromJson(String scheduleJsonStr)
+        private Lesson[] getScheduleDataFromJson(String scheduleJsonStr)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
@@ -124,11 +142,11 @@ public class ScheduleFragment extends Fragment {
             JSONObject scheduleJson = new JSONObject(scheduleJsonStr);
             JSONArray dataArray = scheduleJson.getJSONArray(API_DATA);
 
-            String[] resultStrs = new String[dataArray.length()];
+            Lesson[] resultStrs = new Lesson[dataArray.length()];
             for(int i = 0; i < dataArray.length(); i++) {
                 // For now, using the format "number, description, teacher,room, type"
                 String number;
-                String description;
+                String name;
                 String teacher;
                 String room;
                 String type;
@@ -141,26 +159,24 @@ public class ScheduleFragment extends Fragment {
                 // string field "lesson_room",
                 // string field "lesson_type",
                 // string field "lesson_teacher"
-                description = lesson.getString(API_LESSONS_NAME);
+                name = lesson.getString(API_LESSONS_NAME);
                 number = lesson.getString(API_LESSONS_NUMBER);
                 room = lesson.getString(API_LESSONS_ROOM);
                 type = lesson.getString(API_LESSONS_TYPE);
                 teacher = lesson.getString(API_LESSONS_TEACHER);
 
-                resultStrs[i] = number + ". #" + room + " /" + description + "/ " + type + " ^" + teacher;
+                resultStrs[i] = new Lesson(number, room, name, type, teacher);
             }
 
-            for (String s : resultStrs) {
-                Log.v(LOG_CAT, "Schedule entry: " + s);
+            for (Lesson s : resultStrs) {
+                Log.v(LOG_CAT, "Schedule entry: " + s.toString());
             }
             return resultStrs;
 
         }
 
-
-
         @Override
-        protected String[] doInBackground(String... params) {
+        protected Lesson[] doInBackground(String... params) {
             // If there's no zip code, there's nothing to look up.  Verify size of params.
             if (params.length == 0) {
                 return null;
@@ -171,28 +187,22 @@ public class ScheduleFragment extends Fragment {
             BufferedReader reader = null;
 
             // Will contain the raw JSON response as a string.
-            String forecastJsonStr = null;
-
-            String format = "json";
-            String units = "metric";
-            int numDays = 7;
+            String scheduleJsonStr = null;
 
 
             try {
 
-                final String FORECAST_BASE_URL =  "http://api.rozklad.org.ua/v2/groups/io-32/lessons?filter={'day_number':3,'lesson_week':1}";
+                final String FORECAST_BASE_URL =  "http://api.rozklad.org.ua/v2/groups/";
                 //http://api.rozklad.org.ua/v2/groups/ia-23/lessons?filter={'day_number':3,'lesson_week':1}
-                final String FORMAT_PARAM = "lessons";
-                final String FILTER = "filter=";
-                final String FILTER_MUCH = "{'day_number':3,'lesson_week':1}";
+                final String LESSONS = "lessons";
+                final String FILTERS = "?filter={'day_number':3,'lesson_week':2}";
 
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                            .appendPath(params[0]).build();
-//                        .appendQueryParameter(QUERY_PARAM)
-//                        .appendQueryParameter(FORMAT_PARAM, format)
-//
-//                        .build();
+                        .appendEncodedPath(params[0])
+                        .appendEncodedPath(LESSONS)
+                        .appendEncodedPath(FILTERS).build();
+                       // .appendEncodedPath(FILTER_MUCH).build();
 
                 URL url = new URL(builtUri.toString());
 
@@ -224,8 +234,8 @@ public class ScheduleFragment extends Fragment {
                     // Stream was empty.  No point in parsing.
                     return null;
                 }
-                forecastJsonStr = buffer.toString();
-                Log.v(LOG_CAT, "Forecast JSON string - " +  forecastJsonStr);
+                scheduleJsonStr = buffer.toString();
+                Log.v(LOG_CAT, "Schedule JSON string - " +  scheduleJsonStr);
             } catch (IOException e) {
                 Log.e("PlaceholderFragment", "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
@@ -244,7 +254,7 @@ public class ScheduleFragment extends Fragment {
                 }
             }
             try{
-                return getScheduleDataFromJson(forecastJsonStr);
+                return getScheduleDataFromJson(scheduleJsonStr);
             } catch (JSONException e) {
                 Log.e(LOG_CAT, e.getMessage(), e);
                 e.printStackTrace();
@@ -255,12 +265,85 @@ public class ScheduleFragment extends Fragment {
         }
 
 
-        @Override
-        protected void onPostExecute(String[] result) {
+        protected void onPostExecute(Lesson[] result) {
             if (result != null){
-                mScheduleAdapter.clear();
-                mScheduleAdapter.addAll(result);
+                mLessonAdapter.clear();
+                mLessonAdapter.addAll(result);
             }
         }
+    }
+
+
+    // Adapter for ListView
+    public class LessonAdapter extends ArrayAdapter<Lesson>{
+
+        ArrayList<Lesson> lesons;
+
+
+        public LessonAdapter(Context context, int textViewResourceId, ArrayList<Lesson> objects) {
+            super(context, textViewResourceId, objects);
+            this.lesons = objects;
+        }
+
+        public View getView(int position, View convertView, ViewGroup parent){
+
+            // assign the view we are converting to a local variable
+            View v = convertView;
+
+            // first check to see if the view is null. if so, we have to inflate it.
+            // to inflate it basically means to render, or show, the view.
+            if (v == null) {
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                v = inflater.inflate(R.layout.list_item, null);
+            }
+
+		/*
+		 * Recall that the variable position is sent in as an argument to this method.
+		 * The variable simply refers to the position of the current object in the list. (The ArrayAdapter
+		 * iterates through the list we sent it)
+		 *
+		 * Therefore, i refers to the current Item object.
+		 */
+            Lesson i = lesons.get(position);
+
+            if (i != null) {
+
+                // This is how you obtain a reference to the TextViews.
+                // These TextViews are created in the XML files we defined.
+
+                TextView tt = (TextView) v.findViewById(R.id.toptext);
+                TextView ttd = (TextView) v.findViewById(R.id.toptextdata);
+                TextView mt = (TextView) v.findViewById(R.id.middletext);
+                TextView mtd = (TextView) v.findViewById(R.id.middletextdata);
+                TextView bt = (TextView) v.findViewById(R.id.bottomtext);
+                TextView btd = (TextView) v.findViewById(R.id.desctext);
+
+                // check to see if each individual textview is null.
+                // if not, assign some text!
+                if (tt != null){
+                    tt.setText("№ ");
+                }
+                if (ttd != null){
+                    ttd.setText(i.getLesson_number());
+                }
+                if (mt != null){
+                    mt.setText("Room: ");
+                }
+                if (mtd != null){
+                    mtd.setText(" " + i.getLesson_room());
+                }
+                if (bt != null){
+                    bt.setText("Name: ");
+                }
+                if (btd != null){
+                    btd.setText(i.getLesson_name());
+                }
+            }
+
+            // the view must be returned to our activity
+            return v;
+
+        }
+
     }
 }
