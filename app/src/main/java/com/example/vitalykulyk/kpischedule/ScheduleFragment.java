@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -46,7 +47,7 @@ public class ScheduleFragment extends Fragment {
 
     List<Lesson> testSchedule;
 
-    LessonAdapter mLessonAdapter;
+    static LessonAdapter mLessonAdapter;
 
 
 
@@ -89,6 +90,8 @@ public class ScheduleFragment extends Fragment {
 //
 //        };
 
+
+
         ArrayList<Lesson> testSchedule = new ArrayList<>();
         testSchedule.add(new Lesson("1.","512-18","PPKS","LAB","KORO"));
         testSchedule.add(new Lesson("2.","513-18","KM","LEKT","MARK") );
@@ -117,7 +120,7 @@ public class ScheduleFragment extends Fragment {
         return rootView;
     }
 
-    public class ScheduleTask extends AsyncTask<String, Void, Lesson[]> {
+    public static class ScheduleTask extends AsyncTask<String, Void, Lesson[]> {
 
         private final String LOG_CAT = ScheduleTask.class.getSimpleName();
 
@@ -195,7 +198,7 @@ public class ScheduleFragment extends Fragment {
                 final String FORECAST_BASE_URL =  "http://api.rozklad.org.ua/v2/groups/";
                 //http://api.rozklad.org.ua/v2/groups/ia-23/lessons?filter={'day_number':3,'lesson_week':1}
                 final String LESSONS = "lessons";
-                final String FILTERS = "?filter={'day_number':3,'lesson_week':2}";
+                final String FILTERS = "?filter={'day_number':4,'lesson_week':2}";
 
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
@@ -311,32 +314,30 @@ public class ScheduleFragment extends Fragment {
                 // This is how you obtain a reference to the TextViews.
                 // These TextViews are created in the XML files we defined.
 
-                TextView tt = (TextView) v.findViewById(R.id.toptext);
-                TextView ttd = (TextView) v.findViewById(R.id.toptextdata);
-                TextView mt = (TextView) v.findViewById(R.id.middletext);
-                TextView mtd = (TextView) v.findViewById(R.id.middletextdata);
-                TextView bt = (TextView) v.findViewById(R.id.bottomtext);
-                TextView btd = (TextView) v.findViewById(R.id.desctext);
+                TextView number_of_lesson_value = (TextView) v.findViewById(R.id.number_of_lesson_value);
+                TextView room_value = (TextView) v.findViewById(R.id.room_value);
+                TextView name_of_subject_value = (TextView) v.findViewById(R.id.name_of_subject_value);
+                TextView teacher_name_value = (TextView) v.findViewById(R.id.teacher_name_value);
+                TextView lesson_type_value = (TextView) v.findViewById(R.id.lesson_type_value);
+
+
 
                 // check to see if each individual textview is null.
                 // if not, assign some text!
-                if (tt != null){
-                    tt.setText("№ ");
+                if (number_of_lesson_value != null){
+                    number_of_lesson_value.setText(i.getLesson_number() + ". ");
                 }
-                if (ttd != null){
-                    ttd.setText(i.getLesson_number());
+                if (room_value != null){
+                    room_value.setText(" " + i.getLesson_room());
                 }
-                if (mt != null){
-                    mt.setText("Room: ");
+                if (name_of_subject_value != null){
+                    name_of_subject_value.setText(i.getLesson_name());
                 }
-                if (mtd != null){
-                    mtd.setText(" " + i.getLesson_room());
+                if (teacher_name_value != null){
+                    teacher_name_value.setText(" " + i.getTeacher_name());
                 }
-                if (bt != null){
-                    bt.setText("Name: ");
-                }
-                if (btd != null){
-                    btd.setText(i.getLesson_name());
+                if (lesson_type_value != null){
+                    lesson_type_value.setText(i.getLesson_type());
                 }
             }
 
