@@ -1,11 +1,12 @@
 package com.example.vitalykulyk.kpischedule;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +44,7 @@ public class ScheduleFragment extends Fragment {
     //Array adapter for
     ArrayAdapter<Lesson> mScheduleAdapter;
 
-    ListView mListView;
+    static ListView mListView;
 
     List<Lesson> testSchedule;
 
@@ -82,40 +83,13 @@ public class ScheduleFragment extends Fragment {
 //        ScheduleTask scheduleTask = new ScheduleTask();
 //        scheduleTask.execute("io-32");
 
-//        Lesson[] scheduleArray = {
-//                new Lesson("1.","512-18","PPKS","LAB","KORO"),
-//                new Lesson("2.","513-18","KM","LEKT","MARK") ,
-//                new Lesson("3.","511-18","OOP","LAB","SIMO") ,
-//                new Lesson("4.","515-18","KS","LAB","KULA")  ,
-//
-//        };
-
-
-
         ArrayList<Lesson> testSchedule = new ArrayList<>();
-        testSchedule.add(new Lesson("1.","512-18","PPKS","LAB","KORO"));
-        testSchedule.add(new Lesson("2.","513-18","KM","LEKT","MARK") );
-        testSchedule.add(new Lesson("3.","511-18","OOP","LAB","SIMO") );
-        testSchedule.add(new Lesson("4.","515-18","KS","LAB","KULA")  );
-
-
-//        mScheduleAdapter = new ArrayAdapter<Lesson>(
-//                //current context
-//                getActivity(),
-//                //ID of list item
-//                R.layout.list_item_schedule,
-//                //forecast data
-//                R.id.list_item_forecast_textview,
-//                //forecast data
-//                testSchedule);
 
         mListView = (ListView)rootView.findViewById(R.id.listview_forecast);
 
-        //mListView.setAdapter(mScheduleAdapter);
-
         mLessonAdapter = new LessonAdapter(getActivity(), R.layout.list_item, testSchedule);
 
-        mListView.setAdapter(mLessonAdapter);
+
 
         return rootView;
     }
@@ -270,6 +244,7 @@ public class ScheduleFragment extends Fragment {
 
         protected void onPostExecute(Lesson[] result) {
             if (result != null){
+                mListView.setAdapter(mLessonAdapter);
                 mLessonAdapter.clear();
                 mLessonAdapter.addAll(result);
             }
