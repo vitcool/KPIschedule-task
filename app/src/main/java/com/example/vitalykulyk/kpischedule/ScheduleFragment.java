@@ -20,6 +20,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,10 +31,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,8 +53,7 @@ public class ScheduleFragment extends Fragment {
 
     List<Lesson> testSchedule;
 
-    static LessonAdapter mLessonAdapter;
-
+    static ScheduleTask.LessonAdapter mLessonAdapter;
 
 
     @Override
@@ -67,7 +71,7 @@ public class ScheduleFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_refresh){
+        if (id == R.id.action_refresh) {
             ScheduleTask scheduleTask = new ScheduleTask();
             scheduleTask.execute("io-32");
             return true;
@@ -75,81 +79,80 @@ public class ScheduleFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-//        ScheduleTask scheduleTask = new ScheduleTask();
-//        scheduleTask.execute("io-32");
-
         ArrayList<Lesson> testSchedule = new ArrayList<>();
 
-        mListView = (ListView)rootView.findViewById(R.id.listview_forecast);
+        mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
 
-        mLessonAdapter = new LessonAdapter(getActivity(), R.layout.list_item, testSchedule);
-
-
+        mLessonAdapter = new ScheduleTask.LessonAdapter(getActivity(), R.layout.list_item, testSchedule);
 
         return rootView;
     }
 
+
     public static class ScheduleTask extends AsyncTask<String, Void, Lesson[]> {
+
 
         private final String LOG_CAT = ScheduleTask.class.getSimpleName();
 
-        /**
-         * Take the String representing the complete forecast in JSON Format and
-         * pull out the data we need to construct the Strings needed for the wireframes.
-         *
-         * Fortunately parsing is easy:  constructor takes the JSON string and converts it
-         * into an Object hierarchy for us.
-         */
-        private Lesson[] getScheduleDataFromJson(String scheduleJsonStr)
+        private Lesson[] getScheduleDataFromJson(String json, String days)
                 throws JSONException {
 
-            // These are the names of the JSON objects that need to be extracted.
-            final String API_DATA = "data";
-            final String API_LESSONS_NUMBER = "lesson_number";
-            final String API_LESSONS_ROOM = "lesson_room";
-            final String API_LESSONS_NAME = "lesson_name";
-            final String API_LESSONS_TYPE = "lesson_type";
-            final String API_LESSONS_TEACHER = "teacher_name";
+            Gson gson = new Gson();
+            Data m = gson.fromJson(json, Data.class);
+            //array of lessons
+            List<Lesson> lessons = m.getLesson();
 
-            JSONObject scheduleJson = new JSONObject(scheduleJsonStr);
-            JSONArray dataArray = scheduleJson.getJSONArray(API_DATA);
+            // list of second week schedule
+            List<List<Lesson>> secondWeekSchedule = new ArrayList<>();
 
-            Lesson[] resultStrs = new Lesson[dataArray.length()];
-            for(int i = 0; i < dataArray.length(); i++) {
-                // For now, using the format "number, description, teacher,room, type"
-                String number;
-                String name;
-                String teacher;
-                String room;
-                String type;
+            // list of first week schedule
+            List<List<Lesson>> firstWeekSchedule = new ArrayList<>();
 
-                // Get the JSON object representing the lesson
-                JSONObject lesson = dataArray.getJSONObject(i);
-
-                // description is in a string field "name",
-                // string field "lesson_number",
-                // string field "lesson_room",
-                // string field "lesson_type",
-                // string field "lesson_teacher"
-                name = lesson.getString(API_LESSONS_NAME);
-                number = lesson.getString(API_LESSONS_NUMBER);
-                room = lesson.getString(API_LESSONS_ROOM);
-                type = lesson.getString(API_LESSONS_TYPE);
-                teacher = lesson.getString(API_LESSONS_TEACHER);
-
-                resultStrs[i] = new Lesson(number, room, name, type, teacher);
+            for (int i = 0; i < lessons.size(); i++) {
+                List<Lesson> day = new ArrayList<>();
+                day.add(lessons.get(i));
+                String bufferDay = lessons.get(i).getDay_number();
+                for (int j = i + 1; j < lessons.size(); j++) {
+                    if (bufferDay.equals(lessons.get(j).getDay_number())) {
+                        day.add(lessons.get(j));
+                        i = j;
+                    } else break;
+                }
+                if (day.get(0).getLesson_week().equals("1")) {
+                    firstWeekSchedule.add(day);
+                } else {
+                    secondWeekSchedule.add(day);
+                }
             }
+            int dayz = getDay(days);
+            Lesson[] array = firstWeekSchedule.get(dayz).toArray(new Lesson[firstWeekSchedule.get(dayz).size()]);
+            return array;
+        }
 
-            for (Lesson s : resultStrs) {
-                Log.v(LOG_CAT, "Schedule entry: " + s.toString());
+        public int getDay(String day){
+            switch (day){
+                case "Tuersday":{
+                    return 0;
+                }
+                case "WednesDay":{
+                    return 1;
+                }
+                case "Thursday":{
+                    return 2;
+                }
+                case "Friday":{
+                    return 3;
+                }
+                default:{
+                    return 0;
+                }
             }
-            return resultStrs;
-
         }
 
         @Override
@@ -169,7 +172,7 @@ public class ScheduleFragment extends Fragment {
 
             try {
 
-                final String FORECAST_BASE_URL =  "http://api.rozklad.org.ua/v2/groups/";
+                final String FORECAST_BASE_URL = "http://api.rozklad.org.ua/v2/groups/";
                 //http://api.rozklad.org.ua/v2/groups/ia-23/lessons?filter={'day_number':3,'lesson_week':1}
                 final String LESSONS = "lessons";
                 final String FILTERS = "?filter={'day_number':4,'lesson_week':2}";
@@ -178,8 +181,8 @@ public class ScheduleFragment extends Fragment {
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                         .appendEncodedPath(params[0])
                         .appendEncodedPath(LESSONS)
-                        .appendEncodedPath(FILTERS).build();
-                       // .appendEncodedPath(FILTER_MUCH).build();
+                        .build();
+                // .appendEncodedPath(FILTER_MUCH).build();
 
                 URL url = new URL(builtUri.toString());
 
@@ -212,13 +215,13 @@ public class ScheduleFragment extends Fragment {
                     return null;
                 }
                 scheduleJsonStr = buffer.toString();
-                Log.v(LOG_CAT, "Schedule JSON string - " +  scheduleJsonStr);
+                Log.v(LOG_CAT, "Schedule JSON string - " + scheduleJsonStr);
             } catch (IOException e) {
                 Log.e("PlaceholderFragment", "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
                 // to parse it.
                 return null;
-            } finally{
+            } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
                 }
@@ -230,50 +233,52 @@ public class ScheduleFragment extends Fragment {
                     }
                 }
             }
-            try{
-                return getScheduleDataFromJson(scheduleJsonStr);
+            try {
+                return getScheduleDataFromJson(scheduleJsonStr, params[1]);
             } catch (JSONException e) {
                 Log.e(LOG_CAT, e.getMessage(), e);
                 e.printStackTrace();
             }
-
             // This will only happen if there was an error getting or parsing the forecast.
             return null;
         }
 
 
+
+        // method wich make parsing JSON string
         protected void onPostExecute(Lesson[] result) {
-            if (result != null){
+            if (result != null) {
                 mListView.setAdapter(mLessonAdapter);
                 mLessonAdapter.clear();
                 mLessonAdapter.addAll(result);
             }
-        }
-    }
 
-
-    // Adapter for ListView
-    public class LessonAdapter extends ArrayAdapter<Lesson>{
-
-        ArrayList<Lesson> lesons;
-
-
-        public LessonAdapter(Context context, int textViewResourceId, ArrayList<Lesson> objects) {
-            super(context, textViewResourceId, objects);
-            this.lesons = objects;
         }
 
-        public View getView(int position, View convertView, ViewGroup parent){
 
-            // assign the view we are converting to a local variable
-            View v = convertView;
 
-            // first check to see if the view is null. if so, we have to inflate it.
-            // to inflate it basically means to render, or show, the view.
-            if (v == null) {
-                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = inflater.inflate(R.layout.list_item, null);
+        // Adapter for ListView
+        public static class LessonAdapter extends ArrayAdapter<Lesson> {
+
+            ArrayList<Lesson> lesons;
+
+
+            public LessonAdapter(Context context, int textViewResourceId, ArrayList<Lesson> objects) {
+                super(context, textViewResourceId, objects);
+                this.lesons = objects;
             }
+
+            public View getView(int position, View convertView, ViewGroup parent) {
+
+                // assign the view we are converting to a local variable
+                View v = convertView;
+
+                // first check to see if the view is null. if so, we have to inflate it.
+                // to inflate it basically means to render, or show, the view.
+                if (v == null) {
+                    LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    v = inflater.inflate(R.layout.list_item, null);
+                }
 
 		/*
 		 * Recall that the variable position is sent in as an argument to this method.
@@ -282,44 +287,48 @@ public class ScheduleFragment extends Fragment {
 		 *
 		 * Therefore, i refers to the current Item object.
 		 */
-            Lesson i = lesons.get(position);
+                Lesson i = lesons.get(position);
 
-            if (i != null) {
+                if (i != null) {
 
-                // This is how you obtain a reference to the TextViews.
-                // These TextViews are created in the XML files we defined.
+                    // This is how you obtain a reference to the TextViews.
+                    // These TextViews are created in the XML files we defined.
 
-                TextView number_of_lesson_value = (TextView) v.findViewById(R.id.number_of_lesson_value);
-                TextView room_value = (TextView) v.findViewById(R.id.room_value);
-                TextView name_of_subject_value = (TextView) v.findViewById(R.id.name_of_subject_value);
-                TextView teacher_name_value = (TextView) v.findViewById(R.id.teacher_name_value);
-                TextView lesson_type_value = (TextView) v.findViewById(R.id.lesson_type_value);
+                    TextView number_of_lesson_value = (TextView) v.findViewById(R.id.number_of_lesson_value);
+                    TextView room_value = (TextView) v.findViewById(R.id.room_value);
+                    TextView name_of_subject_value = (TextView) v.findViewById(R.id.name_of_subject_value);
+                    TextView teacher_name_value = (TextView) v.findViewById(R.id.teacher_name_value);
+                    TextView lesson_type_value = (TextView) v.findViewById(R.id.lesson_type_value);
 
 
-
-                // check to see if each individual textview is null.
-                // if not, assign some text!
-                if (number_of_lesson_value != null){
-                    number_of_lesson_value.setText(i.getLesson_number() + ". ");
+                    // check to see if each individual textview is null.
+                    // if not, assign some text!
+                    if (number_of_lesson_value != null) {
+                        number_of_lesson_value.setText(i.getLesson_number() + ". ");
+                    }
+                    if (room_value != null) {
+                        room_value.setText(" " + i.getLesson_room());
+                    }
+                    if (name_of_subject_value != null) {
+                        name_of_subject_value.setText(i.getLesson_name());
+                    }
+                    if (teacher_name_value != null) {
+                        teacher_name_value.setText(" " + i.getTeacher_name());
+                    }
+                    if (lesson_type_value != null) {
+                        lesson_type_value.setText(i.getLesson_type());
+                    }
                 }
-                if (room_value != null){
-                    room_value.setText(" " + i.getLesson_room());
-                }
-                if (name_of_subject_value != null){
-                    name_of_subject_value.setText(i.getLesson_name());
-                }
-                if (teacher_name_value != null){
-                    teacher_name_value.setText(" " + i.getTeacher_name());
-                }
-                if (lesson_type_value != null){
-                    lesson_type_value.setText(i.getLesson_type());
-                }
+
+                // the view must be returned to our activity
+                return v;
+
             }
 
-            // the view must be returned to our activity
-            return v;
-
         }
-
     }
 }
+
+
+
+
