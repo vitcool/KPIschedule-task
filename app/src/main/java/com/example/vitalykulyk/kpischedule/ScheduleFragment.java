@@ -65,17 +65,11 @@ public class ScheduleFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.schedule_fragment, menu);
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_refresh) {
-            ScheduleTask scheduleTask = new ScheduleTask();
-            scheduleTask.execute("io-32");
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 

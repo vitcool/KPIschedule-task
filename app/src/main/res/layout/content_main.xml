@@ -14,29 +14,10 @@
     tools:context="com.example.vitalykulyk.kpischedule.MainActivity"
     tools:showIn="@layout/activity_main">
 
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <fragment
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:name="com.example.vitalykulyk.kpischedule.SearchFragment"
-            android:id="@+id/search_fragment"
-            android:layout_gravity="center"
-            />
-
-        <fragment
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:name="com.example.vitalykulyk.kpischedule.ScheduleFragment"
-            android:id="@+id/schedule_fragment"
-            android:layout_gravity="center_horizontal|top"
-            />
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
 
-    </LinearLayout>
 
 </FrameLayout>
