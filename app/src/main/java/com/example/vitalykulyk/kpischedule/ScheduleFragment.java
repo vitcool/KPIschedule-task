@@ -1,11 +1,13 @@
 package com.example.vitalykulyk.kpischedule;
 
+
 import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+
 
 import android.text.format.Time;
 import android.util.Log;

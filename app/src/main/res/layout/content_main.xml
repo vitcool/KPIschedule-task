@@ -14,10 +14,4 @@
     tools:context="com.example.vitalykulyk.kpischedule.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
-
-
-
 </FrameLayout>

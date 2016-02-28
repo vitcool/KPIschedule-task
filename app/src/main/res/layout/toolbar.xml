@@ -7,16 +7,15 @@
                                    android:minHeight="?attr/actionBarSize"
                                    android:background="?attr/colorPrimary"
                                    local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                                   local:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+                                   local:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+
     <EditText
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:id="@+id/editText"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="1"
-        android:text="Введіть номер групи"
-        android:textAlignment="center"/>
-
-</android.support.v7.widget.Toolbar>
+    android:layout_width="100dp"
+    android:layout_height="50dp"
+    android:id="@+id/editText"
+    android:layout_gravity="center_horizontal"
+    android:text="Введіть номер групи"
+    android:textAlignment="center"/>
 
 
+    </android.support.v7.widget.Toolbar>
