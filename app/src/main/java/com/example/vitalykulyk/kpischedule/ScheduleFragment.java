@@ -1,14 +1,14 @@
 package com.example.vitalykulyk.kpischedule;
 
-
-import android.app.Fragment;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
-
+import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,6 +58,7 @@ public class ScheduleFragment extends Fragment {
     static ScheduleTask.LessonAdapter mLessonAdapter;
 
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +90,7 @@ public class ScheduleFragment extends Fragment {
 
         return rootView;
     }
+
 
 
     public static class ScheduleTask extends AsyncTask<String, Void, Lesson[]> {
@@ -132,17 +134,18 @@ public class ScheduleFragment extends Fragment {
         }
 
         public int getDay(String day){
+
             switch (day){
-                case "Tuersday":{
+                case "TUESDAY":{
                     return 0;
                 }
-                case "WednesDay":{
+                case "WEDNESDAY":{
                     return 1;
                 }
-                case "Thursday":{
+                case "THURSDAY":{
                     return 2;
                 }
-                case "Friday":{
+                case "FRIDAY":{
                     return 3;
                 }
                 default:{
@@ -211,6 +214,12 @@ public class ScheduleFragment extends Fragment {
                     return null;
                 }
                 scheduleJsonStr = buffer.toString();
+                ////
+//                SharedPreferences pref = this.getActivity().getPreferences(0);
+//                SharedPreferences.Editor edt = pref.edit();
+//                edt.putString("facebook_id", scheduleJsonStr);
+//                edt.commit();
+                ///
                 Log.v(LOG_CAT, "Schedule JSON string - " + scheduleJsonStr);
             } catch (IOException e) {
                 Log.e("PlaceholderFragment", "Error ", e);

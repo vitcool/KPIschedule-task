@@ -1,13 +1,15 @@
 package com.example.vitalykulyk.kpischedule;
 
 
+import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 
+import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
+import android.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -36,10 +38,13 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     String day;
     EditText search_query;
-    android.app.FragmentTransaction mFragmentTransaction;
-    android.app.FragmentManager mFragmentManager;
+    android.support.v4.app.FragmentTransaction mFragmentTransaction;
+    android.support.v4.app.FragmentManager mFragmentManager;
     boolean isPressed = false;
     boolean isPressedSearch = false;
+    boolean pressedButton = false;
+
+    ViewPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         isPressedSearch = false;
 
-        day = getTodayDay();
+//        day = getNextTodayDay();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -64,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
         });
 
-        mFragmentManager = getFragmentManager();
+        mFragmentManager = getSupportFragmentManager();
 
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
+
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
@@ -81,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
         drawerFragment.setDrawerListener(this);
+
     }
 
     @Override
@@ -104,15 +111,16 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         }
 
         if (id == R.id.action_search){
+
             ScheduleFragment.ScheduleTask scheduleTask = new ScheduleFragment.ScheduleTask();
             String query = String.valueOf(search_query.getText());
-            scheduleTask.execute(query, day);
+            scheduleTask.execute(query, getTodayDay());
             if (!isPressed) {
-                mFragmentTransaction = mFragmentManager.beginTransaction();
                 if (id == R.id.action_search) {
-                    ScheduleFragment schFragment = new ScheduleFragment();
-                    mFragmentTransaction.add(R.id.schedule_fragment, schFragment);//(R.id.schedule_fragment, schFragment);
-                    mFragmentTransaction.commit();
+                    pressedButton = true;
+                    setupViewPager(viewPager);
+//                    ScheduleFragment schFragment = new ScheduleFragment();
+
                 }
                 isPressed = true;
             }
@@ -121,21 +129,46 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new OneFragment(), "ONE");
-        adapter.addFragment(new Tworagment(), "TWO");
-        adapter.addFragment(new ThreeFragment(), "THREE");
+
+//        if (pressedButton == true) {
+//            ScheduleFragment.ScheduleTask mondayTask = new ScheduleFragment.ScheduleTask();
+//            String query = String.valueOf(search_query.getText());
+//            mondayTask.execute(query, "Wednesday");
+//            mFragmentTransaction = mFragmentManager.beginTransaction();
+//            mFragmentTransaction.add(R.id.schedule_fragment, monday);//(R.id.schedule_fragment, schFragment);//(R.id.schedule_fragment, schFragment);
+//            mFragmentTransaction.commit();
+//            adapter = new ViewPagerAdapter(getSupportFragmentManager());
+//        }
+        if (!pressedButton) {
+            ScheduleFragment monday = new ScheduleFragment();
+            ScheduleFragment tuersday = new ScheduleFragment();
+            ScheduleFragment wednesday = new ScheduleFragment();
+            ScheduleFragment thursday = new ScheduleFragment();
+            ScheduleFragment friday = new ScheduleFragment();
+            ScheduleFragment saturday = new ScheduleFragment();
+            ScheduleFragment sunday = new ScheduleFragment();
+
+            adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+            adapter.addFragment(monday, "ПН");
+            adapter.addFragment(tuersday, "ВТ");
+            adapter.addFragment(wednesday, "СР");
+            adapter.addFragment(thursday, "ЧТ");
+            adapter.addFragment(friday, "ПТ");
+            adapter.addFragment(saturday, "СБ");
+            adapter.addFragment(sunday, "НД");
+
+
+        }
         viewPager.setAdapter(adapter);
     }
+
 
     public String getTodayDay(){
         Calendar calendar = Calendar.getInstance();
         switch (calendar.get(Calendar.DAY_OF_WEEK)){
-//                case (Calendar.MONDAY) : {
-//                    return 1;
-//                }
             case (Calendar.TUESDAY) : {
-                return "Tuersday";
+                return "TUESDAY";
             }
             case (Calendar.WEDNESDAY) : {
                 return "WEDNESDAY";
@@ -147,7 +180,25 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 return "FRIDAY";
             }
             default:{
-                return "Tuersday";
+                return "TUESDAY";
+            }
+        }
+    }
+
+    public String getNextTodayDay(){
+        String tag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
+        switch (tag){
+            case ("TUESDAY") : {
+                return "WEDNESDAY";
+            }
+            case ("WEDNESDAY") : {
+                return "THURSDAY";
+            }
+            case ( "THURSDAY") : {
+                return "FRIDAY";
+            }
+            default:{
+                return "TUESDAY";
             }
         }
     }
@@ -180,9 +231,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            //FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             //fragmentTransaction.replace(R.id.container_body, fragment);
-            fragmentTransaction.commit();
+            //fragmentTransaction.commit();
 
             // set the toolbar title
             getSupportActionBar().setTitle(title);
@@ -198,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         }
 
         @Override
-        public android.support.v4.app.Fragment getItem(int position) {
+        public Fragment getItem(int position) {
             return mFragmentList.get(position);
         }
 
@@ -210,6 +261,10 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         public void addFragment(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
+        }
+
+        public int getPositionTitle(String str){
+            return mFragmentTitleList.indexOf(str);
         }
 
         @Override
