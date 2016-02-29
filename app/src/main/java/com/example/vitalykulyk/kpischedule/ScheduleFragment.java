@@ -88,6 +88,9 @@ public class ScheduleFragment extends Fragment {
 
         mLessonAdapter = new ScheduleTask.LessonAdapter(getActivity(), R.layout.list_item, testSchedule);
 
+
+
+
         return rootView;
     }
 

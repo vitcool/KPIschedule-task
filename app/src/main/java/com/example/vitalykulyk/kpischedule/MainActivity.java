@@ -15,9 +15,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -114,31 +117,40 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
             ScheduleFragment.ScheduleTask scheduleTask = new ScheduleFragment.ScheduleTask();
             String query = String.valueOf(search_query.getText());
-            scheduleTask.execute(query, getTodayDay());
+
+            switch (adapter.getRegisteredFragment(viewPager.getCurrentItem())){
+                case "0": {
+                    scheduleTask.execute(query, "TUESDAY");
+                    break;
+                }
+                case "1": {
+                    scheduleTask.execute(query, "WEDNESDAY");
+                    break;
+                }
+                case "2": {
+                    scheduleTask.execute(query, "THURSDAY");
+                    break;
+                }
+                case "3": {
+                    scheduleTask.execute(query, "FRIDAY");
+                    break;
+                }
+            }
+
+            Log.w("GET FRAGMENT _", adapter.getRegisteredFragment(viewPager.getCurrentItem()));
             if (!isPressed) {
                 if (id == R.id.action_search) {
                     pressedButton = true;
-                    setupViewPager(viewPager);
-//                    ScheduleFragment schFragment = new ScheduleFragment();
-
                 }
                 isPressed = true;
             }
         }
+
         return super.onOptionsItemSelected(item);
     }
 
     private void setupViewPager(ViewPager viewPager) {
 
-//        if (pressedButton == true) {
-//            ScheduleFragment.ScheduleTask mondayTask = new ScheduleFragment.ScheduleTask();
-//            String query = String.valueOf(search_query.getText());
-//            mondayTask.execute(query, "Wednesday");
-//            mFragmentTransaction = mFragmentManager.beginTransaction();
-//            mFragmentTransaction.add(R.id.schedule_fragment, monday);//(R.id.schedule_fragment, schFragment);//(R.id.schedule_fragment, schFragment);
-//            mFragmentTransaction.commit();
-//            adapter = new ViewPagerAdapter(getSupportFragmentManager());
-//        }
         if (!pressedButton) {
             ScheduleFragment monday = new ScheduleFragment();
             ScheduleFragment tuersday = new ScheduleFragment();
@@ -150,17 +162,17 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
             adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-            adapter.addFragment(monday, "ПН");
-            adapter.addFragment(tuersday, "ВТ");
-            adapter.addFragment(wednesday, "СР");
-            adapter.addFragment(thursday, "ЧТ");
-            adapter.addFragment(friday, "ПТ");
-            adapter.addFragment(saturday, "СБ");
-            adapter.addFragment(sunday, "НД");
-
-
+            adapter.addFragment(monday, "ПН", "monday");
+            adapter.addFragment(tuersday, "ВТ", "tuesday");
+            adapter.addFragment(wednesday, "СР", "wednesday");
+            adapter.addFragment(thursday, "ЧТ", "thursday");
+            adapter.addFragment(friday, "ПТ", "friday");
+            adapter.addFragment(saturday, "СБ", "suterday");
+            adapter.addFragment(sunday, "НД", "sunday");
         }
+
         viewPager.setAdapter(adapter);
+
     }
 
 
@@ -241,8 +253,12 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
+
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
+        private final List<String> mTagsList = new ArrayList<>();
+
+        SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
         public ViewPagerAdapter(FragmentManager manager) {
             super(manager);
@@ -258,18 +274,37 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             return mFragmentList.size();
         }
 
-        public void addFragment(Fragment fragment, String title) {
+        public void addFragment(Fragment fragment, String title, String tag) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
+            mTagsList.add(tag);
         }
 
-        public int getPositionTitle(String str){
-            return mFragmentTitleList.indexOf(str);
+        public int getPositionTitle(String tag){
+            return mTagsList.indexOf(tag);
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            registeredFragments.put(position, fragment);
+            return fragment;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            registeredFragments.remove(position);
+            super.destroyItem(container, position, object);
+        }
+
+        public String getRegisteredFragment(int position) {
+            return registeredFragments.get(position).getTag().toString().substring(28);
+        }
+
     }
 }
