@@ -9,6 +9,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -48,6 +51,13 @@ import java.util.Objects;
  */
 public class ScheduleFragment extends Fragment {
 
+    private static String FRAGMENT_INSTANCE_NAME = "fragment";
+    ScheduleFragment fragment = null;
+
+    private List<String> myData;
+
+
+
     //Array adapter for
     ArrayAdapter<Lesson> mScheduleAdapter;
 
@@ -63,7 +73,7 @@ public class ScheduleFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
+        this.setRetainInstance(true);
     }
 
     @Override
@@ -76,28 +86,19 @@ public class ScheduleFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
         ArrayList<Lesson> testSchedule = new ArrayList<>();
-
         mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
-
         mLessonAdapter = new ScheduleTask.LessonAdapter(getActivity(), R.layout.list_item, testSchedule);
-
-
-
-
         return rootView;
     }
 
 
 
     public static class ScheduleTask extends AsyncTask<String, Void, Lesson[]> {
-
 
         private final String LOG_CAT = ScheduleTask.class.getSimpleName();
 
@@ -136,6 +137,7 @@ public class ScheduleFragment extends Fragment {
             return array;
         }
 
+
         public int getDay(String day){
 
             switch (day){
@@ -173,12 +175,9 @@ public class ScheduleFragment extends Fragment {
 
 
             try {
-
                 final String FORECAST_BASE_URL = "http://api.rozklad.org.ua/v2/groups/";
-                //http://api.rozklad.org.ua/v2/groups/ia-23/lessons?filter={'day_number':3,'lesson_week':1}
                 final String LESSONS = "lessons";
                 final String FILTERS = "?filter={'day_number':4,'lesson_week':2}";
-
 
                 Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
                         .appendEncodedPath(params[0])
@@ -262,7 +261,6 @@ public class ScheduleFragment extends Fragment {
             }
 
         }
-
 
 
         // Adapter for ListView

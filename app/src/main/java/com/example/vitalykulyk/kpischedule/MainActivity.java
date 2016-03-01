@@ -3,6 +3,7 @@ package com.example.vitalykulyk.kpischedule;
 
 import android.app.ActionBar;
 import android.os.Bundle;
+import android.support.annotation.RequiresPermission;
 import android.support.design.widget.TabLayout;
 
 import android.support.design.widget.TabLayout.Tab;
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     boolean isPressed = false;
     boolean isPressedSearch = false;
     boolean pressedButton = false;
+
+    private Bundle savedState = null;
 
     ViewPagerAdapter adapter;
 
@@ -117,6 +120,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
             ScheduleFragment.ScheduleTask scheduleTask = new ScheduleFragment.ScheduleTask();
             String query = String.valueOf(search_query.getText());
+
+
 
             switch (adapter.getRegisteredFragment(viewPager.getCurrentItem())){
                 case "0": {
@@ -196,6 +201,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
         }
     }
+
+
 
     public String getNextTodayDay(){
         String tag = getSupportFragmentManager().getBackStackEntryAt(getSupportFragmentManager().getBackStackEntryCount() - 1).getName();
