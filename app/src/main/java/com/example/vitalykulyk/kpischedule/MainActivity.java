@@ -1,19 +1,14 @@
 package com.example.vitalykulyk.kpischedule;
 
 
-import android.app.ActionBar;
 import android.os.Bundle;
-import android.support.annotation.RequiresPermission;
 import android.support.design.widget.TabLayout;
 
-import android.support.design.widget.TabLayout.Tab;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -22,9 +17,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import com.example.vitalykulyk.kpischedule.fragments.FragmentDrawer;
+import com.example.vitalykulyk.kpischedule.fragments.ScheduleFragment;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -157,13 +153,13 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private void setupViewPager(ViewPager viewPager) {
 
         if (!pressedButton) {
-            ScheduleFragment monday = new ScheduleFragment();
-            ScheduleFragment tuersday = new ScheduleFragment();
-            ScheduleFragment wednesday = new ScheduleFragment();
-            ScheduleFragment thursday = new ScheduleFragment();
-            ScheduleFragment friday = new ScheduleFragment();
-            ScheduleFragment saturday = new ScheduleFragment();
-            ScheduleFragment sunday = new ScheduleFragment();
+            ScheduleFragment monday = new ScheduleFragment(1);
+            ScheduleFragment tuersday = new ScheduleFragment(2);
+            ScheduleFragment wednesday = new ScheduleFragment(3);
+            ScheduleFragment thursday = new ScheduleFragment(4);
+            ScheduleFragment friday = new ScheduleFragment(5);
+            ScheduleFragment saturday = new ScheduleFragment(6);
+            ScheduleFragment sunday = new ScheduleFragment(7);
 
             adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
@@ -233,15 +229,15 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         String title = getString(R.string.app_name);
         switch (position) {
             case 0:
-                fragment = new ScheduleFragment();
+                fragment = new ScheduleFragment(1);
                 title = getString(R.string.title_home);
                 break;
             case 1:
-                fragment = new ScheduleFragment();
+                fragment = new ScheduleFragment(2);
                 title = getString(R.string.title_friends);
                 break;
             case 2:
-                fragment = new ScheduleFragment();
+                fragment = new ScheduleFragment(3);
                 title = getString(R.string.title_messages);
                 break;
             default:

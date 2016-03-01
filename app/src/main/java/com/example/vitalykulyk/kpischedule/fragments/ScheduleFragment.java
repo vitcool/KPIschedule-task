@@ -1,17 +1,12 @@
-package com.example.vitalykulyk.kpischedule;
+package com.example.vitalykulyk.kpischedule.fragments;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentManager;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,31 +15,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.vitalykulyk.kpischedule.JSONparserclasses.Data;
+import com.example.vitalykulyk.kpischedule.JSONparserclasses.Lesson;
+import com.example.vitalykulyk.kpischedule.R;
 import com.google.gson.Gson;
 
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by Vitaly Kulyk on 23.02.2016.
@@ -66,6 +54,13 @@ public class ScheduleFragment extends Fragment {
     List<Lesson> testSchedule;
 
     static ScheduleTask.LessonAdapter mLessonAdapter;
+
+    int mDay;
+
+
+    public ScheduleFragment (int day){
+        mDay = day;
+    }
 
 
 
@@ -93,6 +88,27 @@ public class ScheduleFragment extends Fragment {
         ArrayList<Lesson> testSchedule = new ArrayList<>();
         mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
         mLessonAdapter = new ScheduleTask.LessonAdapter(getActivity(), R.layout.list_item, testSchedule);
+
+        rootView.findViewById()
+        switch (mDay){
+            case 1:{
+
+                break;
+            }
+            case 2:{
+                break;
+            }
+            case 3:{
+                break;
+            }
+            case 4:{
+                break;
+            }
+            case 5:{
+                break;
+            }
+
+        }
         return rootView;
     }
 

@@ -1,4 +1,4 @@
-package com.example.vitalykulyk.kpischedule;
+package com.example.vitalykulyk.kpischedule.fragments;
 
 
 import android.content.Context;
@@ -14,6 +14,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.vitalykulyk.kpischedule.Adapters.NavDrawerItem;
+import com.example.vitalykulyk.kpischedule.Adapters.NavigationDrawerAdapter;
+import com.example.vitalykulyk.kpischedule.R;
 
 import java.util.ArrayList;
 import java.util.List;

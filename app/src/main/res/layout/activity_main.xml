@@ -40,7 +40,7 @@
             <fragment
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:name="com.example.vitalykulyk.kpischedule.ScheduleFragment"
+                android:name="com.example.vitalykulyk.kpischedule.fragments.ScheduleFragment"
                 android:id="@+id/schedule_fragment"
                 android:layout_gravity="center_horizontal|top"
                 android:layout_marginTop="100dp"/>
@@ -59,7 +59,7 @@
 
     <fragment
         android:id="@+id/fragment_navigation_drawer"
-        android:name="com.example.vitalykulyk.kpischedule.FragmentDrawer"
+        android:name="com.example.vitalykulyk.kpischedule.fragments.FragmentDrawer"
         android:layout_width="@dimen/nav_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
@@ -138,14 +138,14 @@
     <!--<fragment-->
     <!--android:layout_width="wrap_content"-->
     <!--android:layout_height="wrap_content"-->
-    <!--android:name="com.example.vitalykulyk.kpischedule.ScheduleFragment"-->
+    <!--android:name="com.example.vitalykulyk.kpischedule.fragments.ScheduleFragment"-->
     <!--android:id="@+id/schedule_fragment"-->
     <!--android:layout_gravity="center_horizontal|top"-->
     <!--android:layout_marginTop="100dp"/>-->
 
     <!--<fragment-->
         <!--android:id="@+id/fragment_navigation_drawer"-->
-        <!--android:name="com.example.vitalykulyk.kpischedule.FragmentDrawer"-->
+        <!--android:name="com.example.vitalykulyk.kpischedule.fragments.FragmentDrawer"-->
         <!--android:layout_width="@dimen/nav_drawer_width"-->
         <!--android:layout_height="match_parent"-->
         <!--android:layout_gravity="start"-->
@@ -231,7 +231,7 @@
 <!--<fragment-->
     <!--android:layout_width="wrap_content"-->
     <!--android:layout_height="wrap_content"-->
-    <!--android:name="com.example.vitalykulyk.kpischedule.ScheduleFragment"-->
+    <!--android:name="com.example.vitalykulyk.kpischedule.fragments.ScheduleFragment"-->
     <!--android:id="@+id/schedule_fragment"-->
     <!--android:layout_gravity="center_horizontal|top"-->
     <!--android:layout_marginTop="100dp"/>-->
@@ -247,7 +247,7 @@
 
     <!--<fragment-->
     <!--android:id="@+id/fragment_navigation_drawer"-->
-    <!--android:name="com.example.vitalykulyk.kpischedule.FragmentDrawer"-->
+    <!--android:name="com.example.vitalykulyk.kpischedule.fragments.FragmentDrawer"-->
     <!--android:layout_width="@dimen/nav_drawer_width"-->
     <!--android:layout_height="match_parent"-->
     <!--android:layout_gravity="start"-->

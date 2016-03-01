@@ -1,4 +1,4 @@
-package com.example.vitalykulyk.kpischedule;
+package com.example.vitalykulyk.kpischedule.Adapters;
 
 /**
  * Created by Vitaly Kulyk on 27.02.2016.

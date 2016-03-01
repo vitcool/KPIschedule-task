@@ -1,4 +1,4 @@
-package com.example.vitalykulyk.kpischedule;
+package com.example.vitalykulyk.kpischedule.JSONparserclasses;
 
 import java.util.List;
 

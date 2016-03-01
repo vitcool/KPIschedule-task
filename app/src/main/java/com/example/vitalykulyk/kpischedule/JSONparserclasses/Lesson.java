@@ -1,4 +1,4 @@
-package com.example.vitalykulyk.kpischedule;
+package com.example.vitalykulyk.kpischedule.JSONparserclasses;
 
 /**
  * Created by Vitaly Kulyk on 23.02.2016.
